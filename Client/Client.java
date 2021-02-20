@@ -79,7 +79,8 @@ class ClientSomthing {
                         break;
                     }
                     if(str.startsWith("||")){
-                        str = "\n\n"+str+"\n\n";
+                        //todo обработка контента с сервера
+                        continue;
                     }
                     System.out.println(str);
                 }
