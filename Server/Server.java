@@ -52,16 +52,10 @@ public class Server {
             try {
                 // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
-                for (ServerSomthing vr : Server.serverList) {
-                    vr.send(word+ " подключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
-                }
-                Server.story.addStoryEl(word+ " подключился");
-                try {
-                    out.write(word + "\n");
-                    out.flush(); // flush() нужен для выталкивания оставшихся данных
-                    // если такие есть, и очистки потока для дьнейших нужд
-                } catch (IOException ignored) {
-                }
+                    for (ServerSomthing vr : Server.serverList) {
+                        vr.send(word.substring(6)+ " подключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                    }
+                    Server.story.addStoryEl(word.substring(6)+ " подключился");
                 try {
                     while (true) {
                         word = in.readLine();
