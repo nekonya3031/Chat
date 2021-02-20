@@ -19,10 +19,6 @@ public class Server {
                 try {
                     ServerSomthing ss = new ServerSomthing(socket);
                     serverList.add(ss);
-                    for (ServerSomthing vr : Server.serverList) {
-                        vr.send(ss.getName()+ " подключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
-                    }
-                    Server.story.addStoryEl(ss.getName()+ " подключился");
                 } catch (IOException e) {
                     socket.close();
                 }
@@ -56,6 +52,10 @@ public class Server {
             try {
                 // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
+                for (ServerSomthing vr : Server.serverList) {
+                    vr.send(word+ " подключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                }
+                Server.story.addStoryEl(word+ " подключился");
                 try {
                     out.write(word + "\n");
                     out.flush(); // flush() нужен для выталкивания оставшихся данных
