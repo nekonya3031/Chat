@@ -59,7 +59,7 @@ public class Server {
                     }
                     Server.story.addStoryEl(word+ " подключился");
                     System.out.println(word+ " подключился ("+this.getName()+")");
-                    this.name=word.substring(6);
+                    this.name=word;
                 try {
                     while (true) {
                         word = in.readLine();
@@ -67,10 +67,11 @@ public class Server {
                             this.downService(); // харакири
                             break; // если пришла пустая строка - выходим из цикла прослушки
                         }
+                        //todo вынести обработку смс
                         System.out.println(this.name+": " + word);
                         Server.story.addStoryEl(this.name+": " + word);
                         for (ServerSomthing vr : Server.serverList) {
-                            vr.send(word); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                            vr.send(this.name+": " + word); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
                         }
                     }
                 } catch (NullPointerException ignored) {

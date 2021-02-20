@@ -100,8 +100,8 @@ class ClientSomthing {
                     dt1 = new SimpleDateFormat("HH:mm:ss");
                     dtime = dt1.format(time);
                     userWord = inputUser.readLine();
-                    if (userWord.equals("stop")) {
-                        out.write("stop" + "\n");
+                    if (userWord.equals("disconnect")) {
+                        out.write("disconnect" + "\n");
                         ClientSomthing.this.downService();
                         break;
                     } else {
