@@ -54,7 +54,6 @@ public class Server {
                 // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
                     for (ServerSomthing vr : Server.serverList) {
-
                         vr.send(word.substring(6)+ " подключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
                     }
                     Server.story.addStoryEl(word.substring(6)+ " подключился");
@@ -63,7 +62,7 @@ public class Server {
                 try {
                     while (true) {
                         word = in.readLine();
-                        if (word.equals("stop")) {
+                        if (word.equals("disconnect")) {
                             this.downService(); // харакири
                             break; // если пришла пустая строка - выходим из цикла прослушки
                         }
