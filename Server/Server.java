@@ -53,9 +53,11 @@ public class Server {
                 // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
                     for (ServerSomthing vr : Server.serverList) {
+
                         vr.send(word.substring(6)+ " подключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
                     }
                     Server.story.addStoryEl(word.substring(6)+ " подключился");
+                    System.out.println(word.substring(6)+ " подключился ("+this.getName()+")");
                 try {
                     while (true) {
                         word = in.readLine();
