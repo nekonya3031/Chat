@@ -45,10 +45,10 @@ class ClientSomthing {
     }
 
     private void pressNickname() {
-        System.out.print("Press your nick: ");
+        System.out.print("Введите ваш ник: ");
         try {
             nickname = inputUser.readLine();
-            out.write("Hello " + nickname + "\n");
+            out.write(nickname + "\n");
             out.flush();
         } catch (IOException ignored) {
         }
@@ -78,6 +78,9 @@ class ClientSomthing {
                         ClientSomthing.this.downService();
                         break;
                     }
+                    if(str.startsWith("||")){
+                        str = "\n\n"+str+"\n\n";
+                    }
                     System.out.println(str);
                 }
             } catch (IOException e) {
@@ -102,7 +105,7 @@ class ClientSomthing {
                         ClientSomthing.this.downService();
                         break;
                     } else {
-                        out.write("(" + dtime + ") " + nickname + ": " + userWord + "\n");
+                        out.write(userWord + "\n");
                     }
                     out.flush();
                 } catch (IOException e) {
