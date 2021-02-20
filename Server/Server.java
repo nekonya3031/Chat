@@ -95,7 +95,7 @@ public class Server {
         private void downService() {
             Server.story.addStoryEl(name+" отключился");
             for (ServerSomthing vr : Server.serverList) {
-                if(vr==this){continue;}
+                if(vr.equals(this)){continue;}
                 vr.send(name+" отключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
             }
             System.out.println(name+ " отключился ("+this.getName()+")");
