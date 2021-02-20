@@ -2,6 +2,8 @@ import java.io.*;
 import java.net.*;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Server {
 
@@ -9,10 +11,12 @@ public class Server {
     public static LinkedList<ServerSomthing> serverList = new LinkedList<>(); // список всех нитей - экземпляров
     // сервера, слушающих каждый своего клиента
     public static Story story; // история переписки
+    public static Timer executor = new Timer();
 
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         story = new Story();
+        executor.schedule(new Kicker(), 1L);
         System.out.println("Сервер запущен");
         try {
             while (true) {
@@ -54,11 +58,12 @@ public class Server {
             try {
                 // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
+                String message=word+ " в сети";
                     for (ServerSomthing vr : Server.serverList) {
-                        vr.send(word+ " подключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                        vr.send(message); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
                     }
-                    Server.story.addStoryEl(word+ " подключился");
-                    System.out.println(word+ " подключился ("+this.getName()+")");
+                    Server.story.addStoryEl(message);
+                    System.out.println(message);
                     this.name=word;
                 try {
                     while (true) {
@@ -67,11 +72,11 @@ public class Server {
                             this.downService(); // харакири
                             break; // если пришла пустая строка - выходим из цикла прослушки
                         }
-                        //todo вынести обработку смс
-                        System.out.println(this.name+": " + word);
-                        Server.story.addStoryEl(this.name+": " + word);
+                        message = this.name+": " + word;
+                        System.out.println(message);
+                        Server.story.addStoryEl(message);
                         for (ServerSomthing vr : Server.serverList) {
-                            vr.send(this.name+": " + word); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                            vr.send(message);
                         }
                     }
                 } catch (NullPointerException ignored) {
@@ -146,6 +151,15 @@ public class Server {
 
             }
 
+        }
+    }
+    public static class Kicker extends TimerTask{
+
+        @Override
+        public void run() {
+            for (ServerSomthing vr : Server.serverList) {
+                    vr.send("||activePing");
+            }
         }
     }
 }
