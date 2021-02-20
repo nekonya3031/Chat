@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 
 public class Server {
@@ -105,7 +106,8 @@ public class Server {
                     out.close();
                     for (ServerSomthing vr : Server.serverList) {
                         if (vr.equals(this)) vr.interrupt();
-                        Server.serverList.remove(this);
+                        try{
+                        Server.serverList.remove(this);}catch(ConcurrentModificationException e){}
                     }
                 }
             } catch (IOException ignored) {
