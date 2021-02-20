@@ -34,6 +34,7 @@ public class Server {
         private Socket socket;
         private BufferedReader in;
         private BufferedWriter out;
+        private String name;
 
 
         public ServerSomthing(Socket socket) throws IOException {
@@ -58,6 +59,7 @@ public class Server {
                     }
                     Server.story.addStoryEl(word.substring(6)+ " подключился");
                     System.out.println(word.substring(6)+ " подключился ("+this.getName()+")");
+                    this.name=word.substring(6);
                 try {
                     while (true) {
                         word = in.readLine();
@@ -76,6 +78,11 @@ public class Server {
 
 
             } catch (IOException e) {
+                Server.story.addStoryEl(name+" отключился");
+                for (ServerSomthing vr : Server.serverList) {
+                    vr.send(name+" отключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                }
+                System.out.println(name+ " отключился ("+this.getName()+")");
                 this.downService();
             }
         }
