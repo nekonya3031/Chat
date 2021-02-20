@@ -16,7 +16,7 @@ public class Server {
     public static void main(String[] args) throws IOException {
         ServerSocket server = new ServerSocket(PORT);
         story = new Story();
-        executor.schedule(new Kicker(), 1L);
+        executor.schedule(new Kicker(), (long) 0.1f);
         System.out.println("Сервер запущен");
         try {
             while (true) {
