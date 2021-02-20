@@ -78,11 +78,6 @@ public class Server {
 
 
             } catch (IOException e) {
-                Server.story.addStoryEl(name+" отключился");
-                for (ServerSomthing vr : Server.serverList) {
-                    vr.send(name+" отключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
-                }
-                System.out.println(name+ " отключился ("+this.getName()+")");
                 this.downService();
             }
         }
@@ -92,11 +87,17 @@ public class Server {
                 out.write(msg + "\n");
                 out.flush();
             } catch (IOException ignored) {
+                this.downService();
             }
 
         }
 
         private void downService() {
+            Server.story.addStoryEl(name+" отключился");
+            for (ServerSomthing vr : Server.serverList) {
+                vr.send(name+" отключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+            }
+            System.out.println(name+ " отключился ("+this.getName()+")");
             try {
                 if (!socket.isClosed()) {
                     socket.close();
