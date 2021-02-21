@@ -1,21 +1,27 @@
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 public class Grapfics extends JFrame {
     JTextPane textPane;
     JTextField inputer;
+    JPanel panel;
 
     public Grapfics() {
         super("Chat");
-        this.setSize(500, 500);
         textPane = new JTextPane();
-        textPane.setText(textPane.getText() + "NEVER\n");
-        textPane.setEditable(false);
         inputer = new JTextField();
-        this.add(textPane);
-        //this.add(inputer);
-        this.show();
+        textPane.setText(textPane.getText() + "\n");
+        textPane.setEditable(false);
+        textPane.setBounds(10, 10, 400, 400);
+        inputer.setBounds(10, 420, 400, 50);
+        add(textPane);
+        add(inputer);
+        add(inputer);
+        this.setSize(500, 500);
+        setResizable(false);
+        setVisible(true);
     }
 
     public static void main(String[] args) {
@@ -43,6 +49,21 @@ public class Grapfics extends JFrame {
     }
 
     public void in(String s) {
-        textPane.setText(textPane.getText() + s + "\n");
+        String string = textPane.getText();
+        ArrayList<String> strings = new ArrayList<>();
+        for (String baka : string.split("\n")) {
+            strings.add(baka);
+        }
+        for (String teme : s.split("\n")) {
+            strings.add(teme);
+        }
+        while (strings.size() > 24) {
+            strings.remove(0);
+        }
+        String out = "";
+        for (String baka : strings) {
+            out += baka + "\n";
+        }
+        textPane.setText(out);
     }
 }

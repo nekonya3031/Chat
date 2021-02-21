@@ -37,14 +37,9 @@ class ClientSomthing {
         }
     }
 
-    private void pressNickname() {
-        System.out.print("Введите ваш ник: ");
-        try {
-            String nickname = inputUser.readLine();
-            out.write(nickname + "\n");
-            out.flush();
-        } catch (IOException ignored) {
-        }
+    public static void log(String s) {
+        System.out.println(s);
+        g.in(s + "\n");
     }
 
 
@@ -59,9 +54,14 @@ class ClientSomthing {
         }
     }
 
-    public static void log(String s) {
-        System.out.println(s);
-        g.in(s);
+    private void pressNickname() {
+        log("Введите ваш ник: ");
+        try {
+            String nickname = inputUser.readLine();
+            out.write(nickname + "\n");
+            out.flush();
+        } catch (IOException ignored) {
+        }
     }
 
     public static class Handler {
