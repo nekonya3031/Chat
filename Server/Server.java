@@ -161,6 +161,9 @@ class CommandHandler {
                 vr.stop();
             }
         }
+        for (String s : disconnected) {
+            disconnectMessage(s);
+        }
         StringBuilder rtn = new StringBuilder("||online");
         for (Server.ServerSomthing vr : Server.serverList) {
             rtn.append(vr.name).append("/s");
@@ -169,7 +172,7 @@ class CommandHandler {
         return rtn.toString();
     }
 
-    public void disconnectMessage(String name) {
+    public static void disconnectMessage(String name) {
         Server.story.addStoryEl(name + " отключился");
         for (Server.ServerSomthing vr : Server.serverList) {
             vr.send(name + " отключился" + "\n");
