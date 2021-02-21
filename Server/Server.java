@@ -39,7 +39,7 @@ public class Server {
         private Socket socket;
         private BufferedReader in;
         private BufferedWriter out;
-        private String name;
+        public String name;
 
 
         public ServerSomthing(Socket socket) throws IOException {
@@ -72,6 +72,11 @@ public class Server {
                             this.downService(); // харакири
                             break; // если пришла пустая строка - выходим из цикла прослушки
                         }
+                        if (word.equals("||online")){
+                            out.write(CommandHandler.getOnlineList());
+                            out.flush();
+                            continue;
+                        }
                         message = this.name+": " + word;
                         System.out.println(message);
                         Server.story.addStoryEl(message);
@@ -88,7 +93,7 @@ public class Server {
             }
         }
 
-        private void send(String msg) {
+        public void send(String msg) {
             try {
                 out.write(msg + "\n");
                 out.flush();
@@ -98,7 +103,7 @@ public class Server {
 
         }
 
-        private void downService() {
+        public void downService() {
             Server.story.addStoryEl(name+" отключился");
             for (ServerSomthing vr : Server.serverList) {
                 if(vr.equals(this)){continue;}
@@ -123,7 +128,7 @@ public class Server {
 
     static class Story {
 
-        private LinkedList<String> story = new LinkedList<>();
+        public LinkedList<String> story = new LinkedList<>();
 
 
         public void addStoryEl(String el) {
@@ -154,12 +159,23 @@ public class Server {
         }
     }
     public static class Kicker extends TimerTask{
-
         @Override
         public void run() {
             for (ServerSomthing vr : Server.serverList) {
                     vr.send("||activePing");
             }
         }
+    }
+}
+class CommandHandler{
+    public static String getOnlineList(){
+        for (Server.ServerSomthing vr : Server.serverList) {
+            vr.send("||activePing");
+        }
+        String rtn = "||online\n";
+        for(Server.ServerSomthing vr : Server.serverList){
+            rtn+=vr.name+"\n";
+        }
+        return rtn;
     }
 }
