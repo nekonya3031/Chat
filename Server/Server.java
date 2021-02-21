@@ -166,27 +166,26 @@ class CommandHandler {
 
     public static void onlineChecker() {
         System.out.println("ping");
-        if (Server.serverList == null) {
-            return;
-        }
-        ArrayList<String> disconnected = new ArrayList<>();
-        ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
-        for (Server.ServerSomthing vr : Server.serverList) {
-            try {
-                vr.out.write("||activePing");
-            } catch (IOException e) {
-                removed.add(vr);
-                disconnected.add(vr.name);
-                vr.downService();
-                vr.interrupt();
-                vr.stop();
+        if (Server.serverList != null) {
+            ArrayList<String> disconnected = new ArrayList<>();
+            ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
+            for (Server.ServerSomthing vr : Server.serverList) {
+                try {
+                    vr.out.write("||activePing");
+                } catch (IOException e) {
+                    removed.add(vr);
+                    disconnected.add(vr.name);
+                    vr.downService();
+                    vr.interrupt();
+                    vr.stop();
+                }
             }
-        }
-        for (Server.ServerSomthing vr : removed) {
-            Server.serverList.remove(vr);
-        }
-        for (String s : disconnected) {
-            disconnectMessage(s);
+            for (Server.ServerSomthing vr : removed) {
+                Server.serverList.remove(vr);
+            }
+            for (String s : disconnected) {
+                disconnectMessage(s);
+            }
         }
     }
 
