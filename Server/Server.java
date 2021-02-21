@@ -4,6 +4,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class Server {
 
@@ -27,6 +28,7 @@ public class Server {
                     break;
                 }
             }
+            executor.schedule(new CommandHandler.Killer(), 1L);
         }
     }
 
@@ -146,6 +148,26 @@ public class Server {
 
 class CommandHandler {
     public static String getOnlineList() {
+        StringBuilder rtn = new StringBuilder("||online");
+        for (Server.ServerSomthing vr : Server.serverList) {
+            rtn.append(vr.name).append("/s");
+        }
+        rtn.append("\n");
+        return rtn.toString();
+    }
+
+    public static void disconnectMessage(String name) {
+        Server.story.addStoryEl(name + " отключился");
+        for (Server.ServerSomthing vr : Server.serverList) {
+            vr.send(name + " отключился" + "\n");
+        }
+        System.out.println(name + " отключился");
+    }
+
+    public static void onlineChecker() {
+        if (Server.serverList == null) {
+            return;
+        }
         ArrayList<String> disconnected = new ArrayList<>();
         ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
         for (Server.ServerSomthing vr : Server.serverList) {
@@ -165,19 +187,12 @@ class CommandHandler {
         for (String s : disconnected) {
             disconnectMessage(s);
         }
-        StringBuilder rtn = new StringBuilder("||online");
-        for (Server.ServerSomthing vr : Server.serverList) {
-            rtn.append(vr.name).append("/s");
-        }
-        rtn.append("\n");
-        return rtn.toString();
     }
 
-    public static void disconnectMessage(String name) {
-        Server.story.addStoryEl(name + " отключился");
-        for (Server.ServerSomthing vr : Server.serverList) {
-            vr.send(name + " отключился" + "\n");
+    static class Killer extends TimerTask {
+        @Override
+        public void run() {
+            onlineChecker();
         }
-        System.out.println(name + " отключился");
     }
 }
