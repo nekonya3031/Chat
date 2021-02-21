@@ -5,9 +5,14 @@ import java.util.ArrayList;
 public class Client {
     public static String ipAddr = "shizashizashiza.ml";
     public static int port = 8080;
+    public static ClientSomthing clientSomthing;
 
     public static void main(String[] args) {
-        new ClientSomthing(ipAddr, port);
+        clientSomthing = new ClientSomthing(ipAddr, port);
+    }
+
+    public static void send(String s) {
+        clientSomthing.send(s);
     }
 }
 
@@ -18,6 +23,15 @@ class ClientSomthing {
     private BufferedWriter out;
     private BufferedReader inputUser;
     public static ArrayList<String> online = new ArrayList<>();
+
+    public void send(String s) {
+        try {
+            out.write(s + "\n");
+            out.flush();
+        } catch (IOException ignored) {
+
+        }
+    }
 
     public ClientSomthing(String addr, int port) {
         try {
