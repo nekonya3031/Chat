@@ -15,7 +15,7 @@ public class Server {
     public static Timer executor = new Timer();
 
     public static void main(String[] args) throws IOException {
-        executor.schedule(new CommandHandler.Killer(), 1L);
+        executor.schedule(new CommandHandler.Killer(), 1L, 1L);
         try (ServerSocket server = new ServerSocket(PORT)) {
             story = new Story();
             System.out.println("Сервер запущен");
