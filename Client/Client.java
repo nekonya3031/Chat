@@ -1,10 +1,11 @@
-import java.net.*;
 import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 
 public class Client {
     public static String ipAddr = "shizashizashiza.ml";
     public static int port = 8080;
+
     public static void main(String[] args) {
         new ClientSomthing(ipAddr, port);
     }
@@ -54,30 +55,25 @@ class ClientSomthing {
                 in.close();
                 out.close();
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
-    private class ReadMsg extends Thread {
-        @Override
-        public void run() {
-
-            String str;
-            try {
-                while (true) {
-                    str = in.readLine();
-                    if (str.equals("stop")) {
-                        ClientSomthing.this.downService();
-                        break;
-                    }
-                    if(str.startsWith("||")){
-                        Handler.handle(str);
-                        continue;
-                    }
-                    System.out.println(str);
-                }
-            } catch (IOException e) {
-                ClientSomthing.this.downService();
+    public static class Handler {
+        public static void handle(String message) {
+            if (message.startsWith("||online")) {
+                online(message);
             }
+        }
+
+        public static void online(String message) {
+            message = message.substring(8);
+            ArrayList<String> rtn = new ArrayList<>();
+            for (String s : message.split("/s")) {
+                rtn.add(s);
+                System.out.println(s);
+            }
+            online = rtn;
         }
     }
 
@@ -105,20 +101,28 @@ class ClientSomthing {
             }
         }
     }
-    public static class Handler{
-        public static void handle(String message){
-            if(message.startsWith("||online")){
-                online(message);
+
+    private class ReadMsg extends Thread {
+        @Override
+        public void run() {
+
+            String str;
+            try {
+                while (true) {
+                    str = in.readLine();
+                    if (str.equals("stop")) {
+                        ClientSomthing.this.downService();
+                        break;
+                    }
+                    if (str.startsWith("||")) {
+                        Handler.handle(str);
+                        continue;
+                    }
+                    System.out.println(str);
+                }
+            } catch (IOException e) {
+                ClientSomthing.this.downService();
             }
-        }
-        public static void online(String message){
-            message = message.substring(8);
-            ArrayList<String> rtn = new ArrayList<>();
-            for(String s:message.split("/s")){
-                rtn.add(s);
-                System.out.println(s);
-            }
-            online=rtn;
         }
     }
 }

@@ -1,5 +1,6 @@
 import java.io.*;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.Timer;
@@ -14,11 +15,10 @@ public class Server {
     public static Timer executor = new Timer();
 
     public static void main(String[] args) throws IOException {
-        ServerSocket server = new ServerSocket(PORT);
-        story = new Story();
-        executor.schedule(new Kicker(), (long) 0.1f);
-        System.out.println("Сервер запущен");
-        try {
+        try (ServerSocket server = new ServerSocket(PORT)) {
+            story = new Story();
+            executor.schedule(new Kicker(), (long) 0.1f);
+            System.out.println("Сервер запущен");
             while (true) {
                 Socket socket = server.accept();
                 try {
@@ -26,19 +26,17 @@ public class Server {
                     serverList.add(ss);
                 } catch (IOException e) {
                     socket.close();
+                    break;
                 }
             }
-        } finally {
-            server.close();
         }
     }
 
-
     static class ServerSomthing extends Thread {
 
-        private Socket socket;
-        private BufferedReader in;
-        private BufferedWriter out;
+        private final Socket socket;
+        private final BufferedReader in;
+        private final BufferedWriter out;
         public String name;
 
 
@@ -58,13 +56,13 @@ public class Server {
             try {
                 // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
-                String message=word+ " в сети";
-                    for (ServerSomthing vr : Server.serverList) {
-                        vr.send(message); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
-                    }
-                    Server.story.addStoryEl(message);
-                    System.out.println(message);
-                    this.name=word;
+                String message = word + " в сети";
+                for (ServerSomthing vr : Server.serverList) {
+                    vr.send(message); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                }
+                Server.story.addStoryEl(message);
+                System.out.println(message);
+                this.name = word;
                 try {
                     while (true) {
                         word = in.readLine();
@@ -72,12 +70,12 @@ public class Server {
                             this.downService(); // харакири
                             break; // если пришла пустая строка - выходим из цикла прослушки
                         }
-                        if (word.equals("||online")){
+                        if (word.equals("||online")) {
                             out.write(CommandHandler.getOnlineList());
                             out.flush();
                             continue;
                         }
-                        message = this.name+": " + word;
+                        message = this.name + ": " + word;
                         System.out.println(message);
                         Server.story.addStoryEl(message);
                         for (ServerSomthing vr : Server.serverList) {
@@ -104,12 +102,14 @@ public class Server {
         }
 
         public void downService() {
-            Server.story.addStoryEl(name+" отключился");
+            Server.story.addStoryEl(name + " отключился");
             for (ServerSomthing vr : Server.serverList) {
-                if(vr.equals(this)){continue;}
-                vr.send(name+" отключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
+                if (vr.equals(this)) {
+                    continue;
+                }
+                vr.send(name + " отключился"); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
             }
-            System.out.println(name+ " отключился ("+this.getName()+")");
+            System.out.println(name + " отключился (" + this.getName() + ")");
             try {
                 if (!socket.isClosed()) {
                     socket.close();
@@ -117,8 +117,10 @@ public class Server {
                     out.close();
                     for (ServerSomthing vr : Server.serverList) {
                         if (vr.equals(this)) vr.interrupt();
-                        try{
-                        Server.serverList.remove(this);}catch(ConcurrentModificationException e){}
+                        try {
+                            Server.serverList.remove(this);
+                        } catch (ConcurrentModificationException ignored) {
+                        }
                     }
                 }
             } catch (IOException ignored) {
@@ -158,25 +160,27 @@ public class Server {
 
         }
     }
-    public static class Kicker extends TimerTask{
+
+    public static class Kicker extends TimerTask {
         @Override
         public void run() {
             for (ServerSomthing vr : Server.serverList) {
-                    vr.send("||activePing");
+                vr.send("||activePing");
             }
         }
     }
 }
-class CommandHandler{
-    public static String getOnlineList(){
+
+class CommandHandler {
+    public static String getOnlineList() {
         for (Server.ServerSomthing vr : Server.serverList) {
             vr.send("||activePing");
         }
-        String rtn = "||online";
-        for(Server.ServerSomthing vr : Server.serverList){
-            rtn+=vr.name+"/s";
+        StringBuilder rtn = new StringBuilder("||online");
+        for (Server.ServerSomthing vr : Server.serverList) {
+            rtn.append(vr.name).append("/s");
         }
-        rtn+="\n";
-        return rtn;
+        rtn.append("\n");
+        return rtn.toString();
     }
 }
