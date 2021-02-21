@@ -170,7 +170,7 @@ class CommandHandler {
             ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
             for (Server.ServerSomthing vr : Server.serverList) {
                 try {
-                    vr.out.write("||activePing");
+                    vr.out.write("||activePing\n");
                     vr.out.flush();
                 } catch (IOException e) {
                     removed.add(vr);
