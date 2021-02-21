@@ -165,6 +165,7 @@ class CommandHandler {
     }
 
     public static void onlineChecker() {
+        System.out.println("ping");
         if (Server.serverList == null) {
             return;
         }
