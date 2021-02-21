@@ -172,12 +172,11 @@ class CommandHandler {
             for (Server.ServerSomthing vr : Server.serverList) {
                 try {
                     vr.out.write("||activePing");
+                    vr.out.flush();
                 } catch (IOException e) {
                     removed.add(vr);
                     disconnected.add(vr.name);
                     vr.downService();
-                    vr.interrupt();
-                    vr.stop();
                 }
             }
             for (Server.ServerSomthing vr : removed) {
@@ -186,7 +185,10 @@ class CommandHandler {
             for (String s : disconnected) {
                 disconnectMessage(s);
             }
+            System.out.println("Re:moved");
+            return;
         }
+        System.out.println("ignored");
     }
 
     static class Killer extends TimerTask {
