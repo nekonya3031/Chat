@@ -119,14 +119,11 @@ public class Server {
 
 
         public void addStoryEl(String el) {
-            // если сообщений больше 10, удаляем первое и добавляем новое
-            // иначе просто добавить
+
             if (story.size() >= 20) {
                 story.removeFirst();
-                story.add(el);
-            } else {
-                story.add(el);
             }
+            story.add(el);
         }
 
         public void printStory(BufferedWriter writer) {
@@ -150,16 +147,20 @@ public class Server {
 class CommandHandler {
     public static String getOnlineList() {
         ArrayList<String> disconnected = new ArrayList<>();
+        ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
         for (Server.ServerSomthing vr : Server.serverList) {
             try {
                 vr.out.write("||activePing");
             } catch (IOException e) {
-                Server.serverList.remove(vr);
+                removed.add(vr);
                 disconnected.add(vr.name);
                 vr.downService();
                 vr.interrupt();
                 vr.stop();
             }
+        }
+        for (Server.ServerSomthing vr : removed) {
+            Server.serverList.remove(vr);
         }
         for (String s : disconnected) {
             disconnectMessage(s);
