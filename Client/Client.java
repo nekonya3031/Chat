@@ -12,7 +12,7 @@ public class Client {
 }
 
 class ClientSomthing {
-
+    public static Grapfics g = new Grapfics();
     private Socket socket;
     private BufferedReader in;
     private BufferedWriter out;
@@ -59,6 +59,11 @@ class ClientSomthing {
         }
     }
 
+    public static void log(String s) {
+        System.out.println(s);
+        g.in(s);
+    }
+
     public static class Handler {
         public static void handle(String message) {
             if (message.startsWith("||online")) {
@@ -71,7 +76,7 @@ class ClientSomthing {
             ArrayList<String> rtn = new ArrayList<>();
             for (String s : message.split("/s")) {
                 rtn.add(s);
-                System.out.println(s);
+                log(s);
             }
             online = rtn;
         }
@@ -118,7 +123,7 @@ class ClientSomthing {
                         Handler.handle(str);
                         continue;
                     }
-                    System.out.println(str);
+                    log(str);
                 }
             } catch (IOException e) {
                 ClientSomthing.this.downService();
