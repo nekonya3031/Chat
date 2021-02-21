@@ -176,6 +176,7 @@ class CommandHandler{
         for(Server.ServerSomthing vr : Server.serverList){
             rtn+=vr.name+"/s";
         }
+        rtn+="\n";
         return rtn;
     }
 }
