@@ -46,6 +46,8 @@ class ClientSomthing {
             this.pressNickname();
             new ReadMsg().start();
             new WriteMsg().start();
+            out.write("||online" + "\n");
+            out.flush();
         } catch (IOException e) {
             ClientSomthing.this.downService();
         }
@@ -69,9 +71,8 @@ class ClientSomthing {
     }
 
     private void pressNickname() {
-        log("Введите ваш ник: ");
         try {
-            String nickname = inputUser.readLine();
+            String nickname = g.loginDialog();
             out.write(nickname + "\n");
             out.flush();
         } catch (IOException ignored) {
@@ -90,9 +91,9 @@ class ClientSomthing {
             ArrayList<String> rtn = new ArrayList<>();
             for (String s : message.split("/s")) {
                 rtn.add(s);
-                log(s);
             }
             online = rtn;
+            g.online();
         }
     }
 

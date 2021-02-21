@@ -1,10 +1,9 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ConcurrentModificationException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class Server {
 
@@ -36,7 +35,7 @@ public class Server {
 
         private final Socket socket;
         private final BufferedReader in;
-        private final BufferedWriter out;
+        public final BufferedWriter out;
         public String name;
 
 
@@ -96,21 +95,11 @@ public class Server {
                 out.write(msg + "\n");
                 out.flush();
             } catch (IOException ignored) {
-                this.downService();
             }
 
         }
 
         public void downService() {
-            Server.story.addStoryEl(name + " отключился");
-            for (ServerSomthing vr : Server.serverList) {
-                try {
-                    out.write(name + " отключился" + "\n");
-                    out.flush();
-                } catch (IOException ignored) {
-                }
-            }
-            System.out.println(name + " отключился (" + this.getName() + ")");
             try {
                 if (!socket.isClosed()) {
                     socket.close();
@@ -118,10 +107,6 @@ public class Server {
                     out.close();
                     for (ServerSomthing vr : Server.serverList) {
                         if (vr.equals(this)) vr.interrupt();
-                        try {
-                            Server.serverList.remove(this);
-                        } catch (ConcurrentModificationException ignored) {
-                        }
                     }
                 }
             } catch (IOException ignored) {
@@ -137,7 +122,7 @@ public class Server {
         public void addStoryEl(String el) {
             // если сообщений больше 10, удаляем первое и добавляем новое
             // иначе просто добавить
-            if (story.size() >= 10) {
+            if (story.size() >= 20) {
                 story.removeFirst();
                 story.add(el);
             } else {
@@ -148,7 +133,7 @@ public class Server {
         public void printStory(BufferedWriter writer) {
             if (story.size() > 0) {
                 try {
-                    writer.write("Последние 10 сообщений" + "\n");
+                    writer.write("Последние 20 сообщений" + "\n");
                     for (String vr : story) {
                         writer.write(vr + "\n");
                     }
@@ -161,21 +146,21 @@ public class Server {
 
         }
     }
-
-    public static class Kicker extends TimerTask {
-        @Override
-        public void run() {
-            for (ServerSomthing vr : Server.serverList) {
-                vr.send("||activePing");
-            }
-        }
-    }
 }
 
 class CommandHandler {
     public static String getOnlineList() {
+        ArrayList<String> disconnected = new ArrayList<>();
         for (Server.ServerSomthing vr : Server.serverList) {
-            vr.send("||activePing");
+            try {
+                vr.out.write("||activePing");
+            } catch (IOException e) {
+                Server.serverList.remove(vr);
+                disconnected.add(vr.name);
+                vr.downService();
+                vr.interrupt();
+                vr.stop();
+            }
         }
         StringBuilder rtn = new StringBuilder("||online");
         for (Server.ServerSomthing vr : Server.serverList) {
@@ -183,5 +168,13 @@ class CommandHandler {
         }
         rtn.append("\n");
         return rtn.toString();
+    }
+
+    public void disconnectMessage(String name) {
+        Server.story.addStoryEl(name + " отключился");
+        for (Server.ServerSomthing vr : Server.serverList) {
+            vr.send(name + " отключился" + "\n");
+        }
+        System.out.println(name + " отключился");
     }
 }
