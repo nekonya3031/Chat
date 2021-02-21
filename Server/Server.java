@@ -165,7 +165,6 @@ class CommandHandler {
     }
 
     public static void onlineChecker() {
-        System.out.println("ping");
         if (Server.serverList != null) {
             ArrayList<String> disconnected = new ArrayList<>();
             ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
@@ -185,10 +184,8 @@ class CommandHandler {
             for (String s : disconnected) {
                 disconnectMessage(s);
             }
-            System.out.println("Re:moved");
             return;
         }
-        System.out.println("ignored");
     }
 
     static class Killer extends TimerTask {
