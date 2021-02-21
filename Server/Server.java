@@ -172,9 +172,9 @@ class CommandHandler{
         for (Server.ServerSomthing vr : Server.serverList) {
             vr.send("||activePing");
         }
-        String rtn = "||online\n";
+        String rtn = "||online";
         for(Server.ServerSomthing vr : Server.serverList){
-            rtn+=vr.name+"\n";
+            rtn+=vr.name+"/s";
         }
         return rtn;
     }

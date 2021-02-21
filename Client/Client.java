@@ -1,7 +1,6 @@
 import java.net.*;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 
 public class Client {
     public static String ipAddr = "shizashizashiza.ml";
@@ -17,16 +16,9 @@ class ClientSomthing {
     private BufferedReader in;
     private BufferedWriter out;
     private BufferedReader inputUser;
-    private String addr;
-    private int port;
-    private String nickname;
-    private Date time;
-    private String dtime;
-    private SimpleDateFormat dt1;
+    public static ArrayList<String> online = new ArrayList<>();
 
     public ClientSomthing(String addr, int port) {
-        this.addr = addr;
-        this.port = port;
         try {
             this.socket = new Socket(addr, port);
         } catch (IOException e) {
@@ -47,12 +39,11 @@ class ClientSomthing {
     private void pressNickname() {
         System.out.print("Введите ваш ник: ");
         try {
-            nickname = inputUser.readLine();
+            String nickname = inputUser.readLine();
             out.write(nickname + "\n");
             out.flush();
         } catch (IOException ignored) {
         }
-
     }
 
 
@@ -79,7 +70,7 @@ class ClientSomthing {
                         break;
                     }
                     if(str.startsWith("||")){
-                        //todo обработка контента с сервера
+                        Handler.handle(str);
                         continue;
                     }
                     System.out.println(str);
@@ -97,9 +88,6 @@ class ClientSomthing {
             while (true) {
                 String userWord;
                 try {
-                    time = new Date();
-                    dt1 = new SimpleDateFormat("HH:mm:ss");
-                    dtime = dt1.format(time);
                     userWord = inputUser.readLine();
                     if (userWord.equals("disconnect")) {
                         out.write("disconnect" + "\n");
@@ -115,6 +103,22 @@ class ClientSomthing {
                 }
 
             }
+        }
+    }
+    public static class Handler{
+        public static void handle(String message){
+            if(message.startsWith("||online")){
+                online(message);
+            }
+        }
+        public static void online(String message){
+            message = message.substring(8);
+            ArrayList<String> rtn = new ArrayList<>();
+            for(String s:message.split("/s")){
+                rtn.add(s);
+                System.out.println(s);
+            }
+            online=rtn;
         }
     }
 }
