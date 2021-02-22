@@ -16,7 +16,7 @@ public class Grapfics extends JFrame implements KeyListener{
     java.util.Timer timer = new java.util.Timer();
 
     public Grapfics(){
-        super("Chat");
+        super("Chat" + " - " + Core.version.type + ' ' + Core.version.version + " | " + Core.version.prefix);
         timer.schedule(new OnlineChecker(), 1L, 1L);
         textPane = new JTextPane();
         online = new JTextPane();
@@ -33,16 +33,20 @@ public class Grapfics extends JFrame implements KeyListener{
         textPane.setText(textPane.getText() + "\n");
         textPane.setEditable(false);
         online.setEditable(false);
-        textPane.setBounds(10, 10, 300, 400);
-        inputer.setBounds(10, 420, 250, 25);
-        send.setBounds(270, 420, 40, 25);
-        online.setBounds(320, 10, 160, 440);
+        textPane.setBounds(10, 10, Core.size.x - 200, Core.size.y - 100);
+        textPane.setBackground(new Color(43, 43, 43));
+        inputer.setBounds(10, Core.size.y - 80, Core.size.x - 80, 25);
+        inputer.setBackground(new Color(49, 51, 53));
+        send.setBounds(Core.size.x - 60, Core.size.y - 80, 40, 25);
+        send.setBackground(new Color(116, 122, 128));
+        online.setBounds(Core.size.x - 180, 10, 160, Core.size.y - 100);
+        online.setBackground(new Color(43, 43, 43));
         panel.setLayout(null);
         panel.add(textPane);
         panel.add(online);
         panel.add(inputer);
         panel.add(send);
-        panel.setBackground(new Color(0, 150, 0));
+        panel.setBackground(new Color(60, 63, 65));
         setContentPane(panel);
         this.setSize(Core.size.x, Core.size.y);
         setResizable(false);
