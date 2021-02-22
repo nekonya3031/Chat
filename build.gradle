@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF8'
+}
+task Client (type: Jar) {
+    archiveFileName = "${project.archivesBaseName}-Client.jar"
+    manifest{ attributes 'Main-Class': "chat.client.Client" }
+    from{ configurations.compileClasspath.collect{ it.isDirectory() ? it : it.name.endsWith("pom") ? it : zipTree(it)}}
+    from files(sourceSets.main.output)
+}
+task Server (type: Jar) {
+    archiveFileName = "${project.archivesBaseName}-Server.jar"
+    manifest{ attributes 'Main-Class': "chat.net.Server" }
+    from{ configurations.compileClasspath.collect{ it.isDirectory() ? it : it.name.endsWith("pom") ? it : zipTree(it)}}
+    from files(sourceSets.main.output)
+}
