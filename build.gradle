@@ -2,9 +2,12 @@ plugins {
     id 'java'
 }
 
+setTargetCompatibility(JavaVersion.VERSION_1_8)
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF8'
 }
+
 task Client (type: Jar) {
     archiveFileName = "${project.archivesBaseName}-Client.jar"
     manifest{ attributes 'Main-Class': "chat.client.Client" }
