@@ -3,6 +3,7 @@ plugins {
 }
 
 setTargetCompatibility(JavaVersion.VERSION_1_8)
+setSourceCompatibility(JavaVersion.VERSION_1_8)
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF8'
@@ -16,7 +17,9 @@ task Client (type: Jar) {
 }
 task Server (type: Jar) {
     archiveFileName = "${project.archivesBaseName}-Server.jar"
-    manifest{ attributes 'Main-Class': "chat.net.Server" }
+    manifest{
+        attributes 'Main-Class': "chat.net.Server"
+    }
     from{ configurations.compileClasspath.collect{ it.isDirectory() ? it : it.name.endsWith("pom") ? it : zipTree(it)}}
     from files(sourceSets.main.output)
 }
