@@ -145,6 +145,9 @@ public class Server {
                 send(getOnlineList());
             }
             if (s.startsWith("||story")) {
+                if (s.length() < 10) {
+                    return;
+                }
                 int index = 0;
                 try {
                     index = Integer.parseInt(s.substring(9));

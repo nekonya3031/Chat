@@ -1,11 +1,11 @@
 package chat.client;
 
+import chat.Core;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import chat.*;
 
 public class Client{
     public static ClientSomthing clientSomthing;
@@ -18,15 +18,21 @@ public class Client{
      * Публичная отправка сообщения
      * @param s Текст сообщения
      */
-    public static void send(String s){
+    public static void send(String s) {
         clientSomthing.send(s);
     }
 
     /**
      * Публичный метод остановки приложения
      */
-    public static void exit(){
+    public static void exit() {
         clientSomthing.downService();
+    }
+
+    /**
+     * Приватный метод остановки приложения
+     */
+    public static void exitpr() {
         System.exit(0);
     }
 }
@@ -97,7 +103,7 @@ class ClientSomthing{
                 in.close();
                 out.close();
             }
-            Client.exit();
+            Client.exitpr();
         }catch(IOException ignored){}
     }
 

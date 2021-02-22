@@ -100,7 +100,7 @@ public class Graphics extends JFrame{
      */
     public String loginDialog() {
         return JOptionPane.showInputDialog(this.panel,
-                "Введите никнейм","Регистрация");
+                "Введите никнейм");
     }
 
     /**
