@@ -1,8 +1,5 @@
 package chat.client;
 
-import chat.function.Area;
-import chat.function.Version;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -10,6 +7,9 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TimerTask;
+
+import static chat.Core.size;
+import static chat.Core.version;
 
 public class Graphics extends JFrame{
     JTextPane textPane;
@@ -19,7 +19,7 @@ public class Graphics extends JFrame{
     JTextPane online;
     java.util.Timer timer = new java.util.Timer();
     public Graphics(){
-        super("Chat" + " - " + Version.type + ' ' + Version.version + " | " + Version.prefix);
+        super("Chat" + " - " + version.type + ' ' + version.version + " | " + version.prefix);
         timer.schedule(new OnlineChecker(), 1L, 1L);
         textPane = new JTextPane();
         online = new JTextPane();
@@ -33,16 +33,16 @@ public class Graphics extends JFrame{
         textPane.setText(textPane.getText() + "\n");
         textPane.setEditable(false);
         online.setEditable(false);
-        textPane.setBounds(10, 10, Area.x - 200, Area.y - 100);
+        textPane.setBounds(10, 10, size.x - 200, size.y - 100);
         textPane.setBackground(new Color(43, 43, 43));
-        textPane.setForeground(new Color(255,255,255));
-        input.setBounds(10, Area.y - 80, Area.x - 80, 25);
+        textPane.setForeground(new Color(255, 255, 255));
+        input.setBounds(10, size.y - 80, size.x - 80, 25);
         input.setBackground(new Color(49, 51, 53));
-        input.setForeground(new Color(255,255,255));
-        send.setBounds(Area.x - 60, Area.y - 80, 40, 25);
+        input.setForeground(new Color(255, 255, 255));
+        send.setBounds(size.x - 60, size.y - 80, 40, 25);
         send.setBackground(new Color(116, 122, 128));
-        send.setForeground(new Color(255,255,255));
-        online.setBounds(Area.x - 180, 10, 160, Area.y - 100);
+        send.setForeground(new Color(255, 255, 255));
+        online.setBounds(size.x - 180, 10, 160, size.y - 100);
         online.setBackground(new Color(43, 43, 43));
         online.setForeground(new Color(255,255,255));
         panel.setLayout(null);
@@ -52,7 +52,7 @@ public class Graphics extends JFrame{
         panel.add(send);
         panel.setBackground(new Color(60, 63, 65));
         setContentPane(panel);
-        this.setSize(Area.x, Area.y);
+        this.setSize(size.x, size.y);
         setResizable(false);
         addWindowListener(new WindowAdapter()
         {
