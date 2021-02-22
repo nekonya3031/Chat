@@ -35,12 +35,16 @@ public class Grapfics extends JFrame implements KeyListener{
         online.setEditable(false);
         textPane.setBounds(10, 10, Core.size.x - 200, Core.size.y - 100);
         textPane.setBackground(new Color(43, 43, 43));
+        textPane.setForeground(new Color(255,255,255));
         inputer.setBounds(10, Core.size.y - 80, Core.size.x - 80, 25);
         inputer.setBackground(new Color(49, 51, 53));
+        inputer.setForeground(new Color(255,255,255));
         send.setBounds(Core.size.x - 60, Core.size.y - 80, 40, 25);
         send.setBackground(new Color(116, 122, 128));
+        send.setForeground(new Color(255,255,255));
         online.setBounds(Core.size.x - 180, 10, 160, Core.size.y - 100);
         online.setBackground(new Color(43, 43, 43));
+        online.setForeground(new Color(255,255,255));
         panel.setLayout(null);
         panel.add(textPane);
         panel.add(online);
@@ -50,6 +54,15 @@ public class Grapfics extends JFrame implements KeyListener{
         setContentPane(panel);
         this.setSize(Core.size.x, Core.size.y);
         setResizable(false);
+        addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                Client.exit();
+                e.getWindow().dispose();
+            }
+        });
         setVisible(true);
     }
 

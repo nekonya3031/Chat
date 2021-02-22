@@ -16,6 +16,10 @@ public class Client{
     public static void send(String s){
         clientSomthing.send(s);
     }
+
+    public static void exit(){
+        System.exit(0);
+    }
 }
 
 class ClientSomthing{
@@ -68,6 +72,7 @@ class ClientSomthing{
                 in.close();
                 out.close();
             }
+            Client.exit();
         }catch(IOException ignored){}
     }
 
