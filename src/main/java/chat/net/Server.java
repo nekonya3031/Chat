@@ -1,30 +1,32 @@
 package chat.net;
 
+import chat.Core;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-import chat.*;
+import static chat.net.CommandHandler.getOnlineList;
+import static chat.net.CommandHandler.getStory;
 
-public class Server{
+public class Server {
 
-    public static LinkedList<ServerSomthing> serverList = new LinkedList<>(); // список всех нитей - экземпляров
-    // сервера, слушающих каждый своего клиента
-    public static Story story; // история переписки
+    public static LinkedList<ServerSomthing> serverList = new LinkedList<>();
+    public static Story story;
     public static Timer executor = new Timer();
 
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
         executor.schedule(new CommandHandler.Killer(), 1L, 1L);
-        try(ServerSocket server = new ServerSocket(Core.serverPORT)){
+        try (ServerSocket server = new ServerSocket(Core.serverPORT)) {
             story = new Story();
             System.out.println("Сервер запущен");
-            while(true){
+            while (true) {
                 Socket socket = server.accept();
-                try{
+                try {
                     ServerSomthing ss = new ServerSomthing(socket);
                     serverList.add(ss);
-                }catch (IOException e){
+                } catch (IOException e) {
                     socket.close();
                     break;
                 }
@@ -32,102 +34,152 @@ public class Server{
         }
     }
 
-    static class ServerSomthing extends Thread{
+    /**
+     * Массовый обзвон
+     *
+     * @param message текст обзвона
+     */
+    public static void massSend(String message) {
+        serverList.forEach(e -> e.send(message));
+    }
+
+    /**
+     * Базовый поток сервера
+     */
+    static class ServerSomthing extends Thread {
 
         private final Socket socket;
         private final BufferedReader in;
         public final BufferedWriter out;
         public String name;
 
-
-        public ServerSomthing(Socket socket) throws IOException{
+        /**
+         * базовый конструктор потока
+         *
+         * @param socket Сокет потока
+         * @throws IOException Ошибка игнора
+         */
+        public ServerSomthing(Socket socket) throws IOException {
             this.socket = socket;
-            // если потоку ввода/вывода приведут к генерированию искдючения, оно проброситься дальше
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            Server.story.printStory(out); // поток вывода передаётся для передачи истории последних 10
-            // сооюбщений новому поключению
-            start(); // вызываем run()
+            Server.story.printStory(out);
+            start();
         }
 
         @Override
+        /**
+         * Запуск серверного потока
+         */
         public void run(){
             String word;
             try{
-                // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
                 String message = word + " в сети";
-                for(ServerSomthing vr : Server.serverList){
-                    vr.send(message); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
-                }
+                Server.massSend(message);
                 Server.story.addStoryEl(message);
                 System.out.println(message);
                 this.name = word;
                 try{
-                    while(true){
+                    while (true) {
                         word = in.readLine();
-                        if(word.equals("disconnect")){
-                            this.downService(); // харакири
-                            break; // если пришла пустая строка - выходим из цикла прослушки
+                        if (word.equals("disconnect")) {
+                            this.downService();
+                            break;
                         }
-                        if(word.equals("||online")){
-                            out.write(CommandHandler.getOnlineList());
-                            out.flush();
+                        //TODO вынести в обработчик
+                        if (word.startsWith("||")) {
+                            handle(word);
                             continue;
                         }
                         message = this.name + ": " + word;
                         System.out.println(message);
                         Server.story.addStoryEl(message);
-                        for(ServerSomthing vr : Server.serverList){
-                            vr.send(message);
-                        }
+                        massSend(message);
                     }
-                }catch(NullPointerException ignored){
+                } catch (NullPointerException ignored) {
                 }
 
 
-            }catch(IOException e){
+            } catch (IOException e) {
                 this.downService();
             }
         }
 
-        public void send(String msg){
-            try{
+        /**
+         * Базовая отправка сообщений на клиент привязаный к данному потоку
+         *
+         * @param msg
+         */
+        public void send(String msg) {
+            try {
                 out.write(msg + "\n");
                 out.flush();
-            }catch(IOException ignored) {
+            } catch (IOException ignored) {
             }
 
         }
 
+        /**
+         * Закрытие потока
+         */
         public void downService() {
             try {
                 if (!socket.isClosed()) {
                     socket.close();
                     in.close();
                     out.close();
-                    for (ServerSomthing vr : Server.serverList) {
-                        if (vr.equals(this)) vr.interrupt();
-                    }
+                    this.interrupt();
                 }
             } catch (IOException ignored) {
             }
         }
+
+        /**
+         * Обработка входящих комманд
+         *
+         * @param s команда
+         */
+        public void handle(String s) {
+            if (s.equals("||online")) {
+                send(getOnlineList());
+            }
+            if (s.startsWith("||story")) {
+                int index = 0;
+                try {
+                    index = Integer.parseInt(s.substring(9));
+                } catch (NumberFormatException ignored) {
+                }
+                send(getStory(index));
+            }
+        }
     }
 
+    /**
+     * Класс хранящий историю
+     */
     static class Story {
-
         public LinkedList<String> story = new LinkedList<>();
+        public LinkedList<String> totalStory = new LinkedList<>();
 
-
+        /**
+         * Добавление информации в кратковременную и долговременную истории
+         *
+         * @param el сообщение
+         */
         public void addStoryEl(String el) {
-
             if (story.size() >= 20) {
                 story.removeFirst();
             }
             story.add(el);
+            totalStory.add(el);
         }
 
+        /**
+         * отправка истории в поток
+         *
+         * @param writer поток
+         */
         public void printStory(BufferedWriter writer) {
             if (story.size() > 0) {
                 try {
@@ -147,29 +199,70 @@ public class Server{
 }
 
 class CommandHandler {
-    public static String getOnlineList(){
+    /**
+     * Обработка серверного запроса на онлайн лист
+     *
+     * @return строка для передачи
+     */
+    public static String getOnlineList() {
         StringBuilder rtn = new StringBuilder("||online");
-        for(Server.ServerSomthing vr : Server.serverList){
+        for (Server.ServerSomthing vr : Server.serverList) {
             rtn.append(vr.name).append("/s");
         }
         rtn.append("\n");
         return rtn.toString();
     }
 
-    public static void disconnectMessage(String name){
-        Server.story.addStoryEl(name + " отключился");
-        for(Server.ServerSomthing vr : Server.serverList){
-            vr.send(name + " отключился" + "\n");
+    /**
+     * Запрос истории через сервер
+     *
+     * @param end индекс последнего сообщения
+     * @return строка для отсылки
+     */
+    public static String getStory(int end) {
+        StringBuilder rtn = new StringBuilder("||story");
+        ArrayList<String> rtna = new ArrayList<>();
+        int size = Server.story.totalStory.size() - 1;
+        int startPos = 0;
+        int endPos = 20;
+        if (size - 20 - end > 0) {
+            startPos = size - 20 - end;
+            endPos = size - end;
         }
-        System.out.println(name + " отключился");
+        if (size < 20) {
+            endPos = size;
+        }
+        for (int i = startPos; i < endPos; i++) {
+            rtna.add(Server.story.totalStory.get(i));
+        }
+        rtna.forEach(s -> rtn.append(s).append("/s"));
+        rtn.append("\n");
+        return rtn.toString();
     }
 
-    public static void onlineChecker() throws ConcurrentModificationException{
-        if(Server.serverList != null){
+    /**
+     * Отсылка сообщения об отключении
+     *
+     * @param name ник отключившегося
+     */
+    public static void disconnectMessage(String name) {
+        String message = name + " отключился";
+        Server.story.addStoryEl(message);
+        Server.massSend(message);
+        System.out.println(message);
+    }
+
+    /**
+     * Обзвон участников с исключением неактивных и рассылкой
+     *
+     * @throws ConcurrentModificationException
+     */
+    public static void onlineChecker() throws ConcurrentModificationException {
+        if (Server.serverList != null) {
             ArrayList<String> disconnected = new ArrayList<>();
             ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
-            for(Server.ServerSomthing vr : Server.serverList){
-                try{
+            for (Server.ServerSomthing vr : Server.serverList) {
+                try {
                     vr.out.write("||activePing\n");
                     vr.out.flush();
                 }catch(IOException e){
@@ -178,21 +271,24 @@ class CommandHandler {
                     vr.downService();
                 }
             }
-            for(Server.ServerSomthing vr : removed){
+            for (Server.ServerSomthing vr : removed) {
                 Server.serverList.remove(vr);
             }
-            for(String s : disconnected){
+            for (String s : disconnected) {
                 disconnectMessage(s);
             }
             return;
         }
     }
 
-    static class Killer extends TimerTask{
+    /**
+     * Вызыватель очистки не активных участников
+     */
+    static class Killer extends TimerTask {
         @Override
-        public void run(){
-            try{
-            onlineChecker();
+        public void run() {
+            try {
+                onlineChecker();
             }catch(ConcurrentModificationException ignored){
 
             }
