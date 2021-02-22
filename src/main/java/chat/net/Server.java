@@ -3,10 +3,7 @@ package chat.net;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import chat.*;
 
@@ -167,7 +164,7 @@ class CommandHandler {
         System.out.println(name + " отключился");
     }
 
-    public static void onlineChecker(){
+    public static void onlineChecker() throws ConcurrentModificationException{
         if(Server.serverList != null){
             ArrayList<String> disconnected = new ArrayList<>();
             ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
@@ -194,7 +191,11 @@ class CommandHandler {
     static class Killer extends TimerTask{
         @Override
         public void run(){
+            try{
             onlineChecker();
+            }catch(ConcurrentModificationException ignored){
+
+            }
         }
     }
 }
