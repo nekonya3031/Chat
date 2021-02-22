@@ -3,6 +3,7 @@ package chat.client;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import chat.*;
 
@@ -25,12 +26,13 @@ public class Client{
      * Публичный метод остановки приложения
      */
     public static void exit(){
+        clientSomthing.downService();
         System.exit(0);
     }
 }
 
 class ClientSomthing{
-    public static Grapfics g = new Grapfics();
+    public static Graphics g = new Graphics();
     private Socket socket;
     private BufferedReader in;
     private BufferedWriter out;
@@ -67,7 +69,7 @@ class ClientSomthing{
             out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.pressNickname();
             new ReadMsg().start();
-            new WriteMsg().start();
+            //new WriteMsg().start();
             out.write("||online" + "\n");
             out.flush();
         }catch(IOException e) {
@@ -87,10 +89,11 @@ class ClientSomthing{
     /**
      * Завершение работы приложения
      */
-    private void downService(){
+    public void downService(){
         try{
             if(!socket.isClosed()){
                 socket.close();
+                out.write("disconnect");
                 in.close();
                 out.close();
             }
@@ -98,10 +101,6 @@ class ClientSomthing{
         }catch(IOException ignored){}
     }
 
-    @Deprecated
-    /**
-     * Запрос на ввод ника, скоро будет удален по причине перехода на регистрацию
-     */
     private void pressNickname(){
         try{
             String nickname = g.loginDialog();
@@ -119,22 +118,16 @@ class ClientSomthing{
                 online(message);
             }
         }
-
         public static void online(String message){
             message = message.substring(8);
             ArrayList<String> rtn = new ArrayList<>();
-            for(String s : message.split("/s")){
-                rtn.add(s);
-            }
+            Collections.addAll(rtn, message.split("/s"));
             online = rtn;
             g.online();
         }
     }
 
     @Deprecated
-    /**
-     * Чтение сообщений с консоли, будет удален всвязи с ненадобностью
-     */
     public class WriteMsg extends Thread{
 
         @Override
