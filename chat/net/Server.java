@@ -1,3 +1,5 @@
+package chat.net;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -6,25 +8,26 @@ import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Server {
+import chat.*;
 
-    public static final int PORT = 8080;
+public class Server{
+
     public static LinkedList<ServerSomthing> serverList = new LinkedList<>(); // список всех нитей - экземпляров
     // сервера, слушающих каждый своего клиента
     public static Story story; // история переписки
     public static Timer executor = new Timer();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException{
         executor.schedule(new CommandHandler.Killer(), 1L, 1L);
-        try (ServerSocket server = new ServerSocket(PORT)) {
+        try(ServerSocket server = new ServerSocket(Core.serverPORT)){
             story = new Story();
             System.out.println("Сервер запущен");
-            while (true) {
+            while(true){
                 Socket socket = server.accept();
-                try {
+                try{
                     ServerSomthing ss = new ServerSomthing(socket);
                     serverList.add(ss);
-                } catch (IOException e) {
+                }catch (IOException e){
                     socket.close();
                     break;
                 }
@@ -32,7 +35,7 @@ public class Server {
         }
     }
 
-    static class ServerSomthing extends Thread {
+    static class ServerSomthing extends Thread{
 
         private final Socket socket;
         private final BufferedReader in;
@@ -40,7 +43,7 @@ public class Server {
         public String name;
 
 
-        public ServerSomthing(Socket socket) throws IOException {
+        public ServerSomthing(Socket socket) throws IOException{
             this.socket = socket;
             // если потоку ввода/вывода приведут к генерированию искдючения, оно проброситься дальше
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -51,26 +54,26 @@ public class Server {
         }
 
         @Override
-        public void run() {
+        public void run(){
             String word;
-            try {
+            try{
                 // первое сообщение отправленное сюда - это никнейм
                 word = in.readLine();
                 String message = word + " в сети";
-                for (ServerSomthing vr : Server.serverList) {
+                for(ServerSomthing vr : Server.serverList){
                     vr.send(message); // отослать принятое сообщение с привязанного клиента всем остальным влючая его
                 }
                 Server.story.addStoryEl(message);
                 System.out.println(message);
                 this.name = word;
-                try {
-                    while (true) {
+                try{
+                    while(true){
                         word = in.readLine();
-                        if (word.equals("disconnect")) {
+                        if(word.equals("disconnect")){
                             this.downService(); // харакири
                             break; // если пришла пустая строка - выходим из цикла прослушки
                         }
-                        if (word.equals("||online")) {
+                        if(word.equals("||online")){
                             out.write(CommandHandler.getOnlineList());
                             out.flush();
                             continue;
@@ -78,24 +81,24 @@ public class Server {
                         message = this.name + ": " + word;
                         System.out.println(message);
                         Server.story.addStoryEl(message);
-                        for (ServerSomthing vr : Server.serverList) {
+                        for(ServerSomthing vr : Server.serverList){
                             vr.send(message);
                         }
                     }
-                } catch (NullPointerException ignored) {
+                }catch(NullPointerException ignored){
                 }
 
 
-            } catch (IOException e) {
+            }catch(IOException e){
                 this.downService();
             }
         }
 
-        public void send(String msg) {
-            try {
+        public void send(String msg){
+            try{
                 out.write(msg + "\n");
                 out.flush();
-            } catch (IOException ignored) {
+            }catch(IOException ignored) {
             }
 
         }
@@ -147,50 +150,50 @@ public class Server {
 }
 
 class CommandHandler {
-    public static String getOnlineList() {
+    public static String getOnlineList(){
         StringBuilder rtn = new StringBuilder("||online");
-        for (Server.ServerSomthing vr : Server.serverList) {
+        for(Server.ServerSomthing vr : Server.serverList){
             rtn.append(vr.name).append("/s");
         }
         rtn.append("\n");
         return rtn.toString();
     }
 
-    public static void disconnectMessage(String name) {
+    public static void disconnectMessage(String name){
         Server.story.addStoryEl(name + " отключился");
-        for (Server.ServerSomthing vr : Server.serverList) {
+        for(Server.ServerSomthing vr : Server.serverList){
             vr.send(name + " отключился" + "\n");
         }
         System.out.println(name + " отключился");
     }
 
-    public static void onlineChecker() {
-        if (Server.serverList != null) {
+    public static void onlineChecker(){
+        if(Server.serverList != null){
             ArrayList<String> disconnected = new ArrayList<>();
             ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
-            for (Server.ServerSomthing vr : Server.serverList) {
-                try {
+            for(Server.ServerSomthing vr : Server.serverList){
+                try{
                     vr.out.write("||activePing\n");
                     vr.out.flush();
-                } catch (IOException e) {
+                }catch(IOException e){
                     removed.add(vr);
                     disconnected.add(vr.name);
                     vr.downService();
                 }
             }
-            for (Server.ServerSomthing vr : removed) {
+            for(Server.ServerSomthing vr : removed){
                 Server.serverList.remove(vr);
             }
-            for (String s : disconnected) {
+            for(String s : disconnected){
                 disconnectMessage(s);
             }
             return;
         }
     }
 
-    static class Killer extends TimerTask {
+    static class Killer extends TimerTask{
         @Override
-        public void run() {
+        public void run(){
             onlineChecker();
         }
     }

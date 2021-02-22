@@ -1,13 +1,13 @@
+package chat.client;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.TimerTask;
+import java.awt.event.*;
+import java.util.*;
 
-public class Grapfics extends JFrame implements KeyListener {
+import chat.*;
+
+public class Grapfics extends JFrame implements KeyListener{
     JTextPane textPane;
     JTextField inputer;
     JPanel panel;
@@ -15,7 +15,7 @@ public class Grapfics extends JFrame implements KeyListener {
     JTextPane online;
     java.util.Timer timer = new java.util.Timer();
 
-    public Grapfics() {
+    public Grapfics(){
         super("Chat");
         timer.schedule(new OnlineChecker(), 1L, 1L);
         textPane = new JTextPane();
@@ -44,7 +44,7 @@ public class Grapfics extends JFrame implements KeyListener {
         panel.add(send);
         panel.setBackground(new Color(0, 150, 0));
         setContentPane(panel);
-        this.setSize(500, 500);
+        this.setSize(Core.size.x, Core.size.y);
         setResizable(false);
         setVisible(true);
     }
@@ -56,18 +56,18 @@ public class Grapfics extends JFrame implements KeyListener {
     public void in(String s) {
         String string = textPane.getText();
         ArrayList<String> strings = new ArrayList<>();
-        for (String baka : string.split("\n")) {
-            strings.add(baka);
+        for(String str : string.split("\n")){
+            strings.add(str);
         }
-        for (String teme : s.split("\n")) {
-            strings.add(teme);
+        for(String str : s.split("\n")){
+            strings.add(str);
         }
-        while (strings.size() > 24) {
+        while(strings.size() > 24){
             strings.remove(0);
         }
         String out = "";
-        for (String baka : strings) {
-            out += baka + "\n";
+        for(String str : strings){
+            out += str + "\n";
         }
         textPane.setText(out);
     }
