@@ -13,10 +13,17 @@ public class Client{
         clientSomthing = new ClientSomthing(Core.ipAddr, Core.port);
     }
 
+    /**
+     * Публичная отправка сообщения
+     * @param s Текст сообщения
+     */
     public static void send(String s){
         clientSomthing.send(s);
     }
 
+    /**
+     * Публичный метод остановки приложения
+     */
     public static void exit(){
         System.exit(0);
     }
@@ -30,6 +37,10 @@ class ClientSomthing{
     private BufferedReader inputUser;
     public static ArrayList<String> online = new ArrayList<>();
 
+    /**
+     * Базовый отсылатель сообщений
+     * @param s Отпраляемая строка
+     */
     public void send(String s){
         try{
             out.write(s + "\n");
@@ -39,9 +50,14 @@ class ClientSomthing{
         }
     }
 
-    public ClientSomthing(String addr, int port){
+    /**
+     * Базовый конструктор сокетклиентского класса
+     * @param address айпи сокета
+     * @param port порт сокета
+     */
+    public ClientSomthing(String address, int port){
         try{
-            this.socket = new Socket(addr, port);
+            this.socket = new Socket(address, port);
         }catch(IOException e) {
             System.err.println("Socket failed");
         }
@@ -59,12 +75,18 @@ class ClientSomthing{
         }
     }
 
+    /**
+     * Запись сообщения в консоль и вывод на графику
+     * @param s текст сообщения
+     */
     public static void log(String s){
         System.out.println(s);
         g.in(s + "\n");
     }
 
-
+    /**
+     * Завершение работы приложения
+     */
     private void downService(){
         try{
             if(!socket.isClosed()){
@@ -76,6 +98,10 @@ class ClientSomthing{
         }catch(IOException ignored){}
     }
 
+    @Deprecated
+    /**
+     * Запрос на ввод ника, скоро будет удален по причине перехода на регистрацию
+     */
     private void pressNickname(){
         try{
             String nickname = g.loginDialog();
@@ -84,6 +110,9 @@ class ClientSomthing{
         }catch(IOException ignored){}
     }
 
+    /**
+     * Обработчик команд приходящих с сервера
+     */
     public static class Handler{
         public static void handle(String message) {
             if (message.startsWith("||online")) {
@@ -102,6 +131,10 @@ class ClientSomthing{
         }
     }
 
+    @Deprecated
+    /**
+     * Чтение сообщений с консоли, будет удален всвязи с ненадобностью
+     */
     public class WriteMsg extends Thread{
 
         @Override
@@ -126,15 +159,17 @@ class ClientSomthing{
         }
     }
 
+    /**
+     * Прослушка сообщений из сокета
+     */
     private class ReadMsg extends Thread{
         @Override
         public void run(){
-
             String str;
             try{
                 while(true){
                     str = in.readLine();
-                    if(str.equals("stop")){
+                    if(str.equals("disconnect")){
                         ClientSomthing.this.downService();
                         break;
                     }
