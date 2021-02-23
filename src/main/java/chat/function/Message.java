@@ -38,11 +38,28 @@ public class Message {
         return Version.gson.toJson(this);
     }
 
-    public Message chatMessage(String text, String author) {
+    public static Message chatMessage(String text, String author) {
         return new Message(Version.getMessage_id(), text, author, 0);
     }
 
-    public Message systemMessage(String text) {
-        return new Message(-1L, text, "SERVER", 1);
+    public static Message infoMessage(String text) {
+        return new Message(Version.getMessage_id(), text, "Информатор", 1);
+    }
+
+    public static Message pingMessage() {
+        return new Message(-1L, "activePing", "SERVER", -2);
+    }
+
+    public static Message onlineMessage(String text) {
+        return new Message(-1L, text, "SERVER", -3);
+    }
+
+    public static Message systemMessage(String text) {
+        return new Message(-1L, text, "SERVER", -1);
+    }
+
+    @Override
+    public String toString() {
+        return date.toString() + " " + name + ": " + text + " (" + type + ")";
     }
 }

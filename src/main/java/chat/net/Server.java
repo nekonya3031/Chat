@@ -1,6 +1,7 @@
 package chat.net;
 
 import chat.Core;
+import chat.function.Message;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -39,7 +40,7 @@ public class Server {
      *
      * @param message текст обзвона
      */
-    public static void massSend(String message) {
+    public static void massSend(Message message) {
         serverList.forEach(e -> e.send(message));
     }
 
@@ -75,7 +76,7 @@ public class Server {
             String word;
             try{
                 word = in.readLine();
-                String message = word + " в сети";
+                Message message = Message.infoMessage(word + " в сети");
                 Server.massSend(message);
                 Server.story.addStoryEl(message);
                 System.out.println(message);
@@ -92,7 +93,7 @@ public class Server {
                             handle(word);
                             continue;
                         }
-                        message = this.name + ": " + word;
+                        message = Message.chatMessage(word, this.name);
                         System.out.println(message);
                         Server.story.addStoryEl(message);
                         massSend(message);
@@ -111,9 +112,9 @@ public class Server {
          *
          * @param msg
          */
-        public void send(String msg) {
+        public void send(Message msg) {
             try {
-                out.write(msg + "\n");
+                out.write(msg.toSend() + "\n");
                 out.flush();
             } catch (IOException ignored) {
             }
@@ -153,7 +154,7 @@ public class Server {
                     index = Integer.parseInt(s.substring(9));
                 } catch (NumberFormatException ignored) {
                 }
-                send(getStory(index));
+                send(new Message(getStory(index)));
             }
         }
     }
@@ -162,15 +163,15 @@ public class Server {
      * Класс хранящий историю
      */
     static class Story {
-        public LinkedList<String> story = new LinkedList<>();
-        public LinkedList<String> totalStory = new LinkedList<>();
+        public LinkedList<Message> story = new LinkedList<>();
+        public LinkedList<Message> totalStory = new LinkedList<>();
 
         /**
          * Добавление информации в кратковременную и долговременную истории
          *
          * @param el сообщение
          */
-        public void addStoryEl(String el) {
+        public void addStoryEl(Message el) {
             if (story.size() >= 20) {
                 story.removeFirst();
             }
@@ -187,8 +188,8 @@ public class Server {
             if (story.size() > 0) {
                 try {
                     writer.write("Последние 20 сообщений" + "\n");
-                    for (String vr : story) {
-                        writer.write(vr + "\n");
+                    for (Message msg : story) {
+                        writer.write(msg.toSend() + "\n");
                     }
                     writer.write("/конец/" + "\n");
                     writer.flush();
@@ -207,12 +208,12 @@ class CommandHandler {
      *
      * @return строка для передачи
      */
-    public static String getOnlineList() {
-        StringBuilder rtn = new StringBuilder("||online");
+    public static Message getOnlineList() {
+        StringBuilder rtn = new StringBuilder();
         for (Server.ServerSomthing vr : Server.serverList) {
             rtn.append(vr.name).append("/s");
         }
-        return rtn.toString();
+        return Message.onlineMessage(rtn.toString());
     }
 
     /**
@@ -235,7 +236,7 @@ class CommandHandler {
             endPos = size;
         }
         for (int i = startPos; i < endPos; i++) {
-            rtna.add(Server.story.totalStory.get(i));
+            rtna.add(Server.story.totalStory.get(i).toString());
         }
         rtna.forEach(s -> rtn.append(s).append("/s"));
         return rtn.toString();
@@ -247,7 +248,7 @@ class CommandHandler {
      * @param name ник отключившегося
      */
     public static void disconnectMessage(String name) {
-        String message = name + " отключился";
+        Message message = Message.infoMessage(name + " отключился");
         Server.story.addStoryEl(message);
         Server.massSend(message);
         System.out.println(message);
