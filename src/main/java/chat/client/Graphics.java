@@ -74,13 +74,23 @@ public class Graphics extends JFrame{
     public void in(String s) {
         String string = textPane.getText();
         ArrayList<String> strings = new ArrayList<>();
+        ArrayList<String> strings2 = new ArrayList<>();
         Collections.addAll(strings, string.split("\n"));
         Collections.addAll(strings, s.split("\n"));
-        while(strings.size() > 24){
+        for (String se : strings) {
+            if (se.length() < 60) {
+                strings2.add(se);
+                continue;
+            }
+            strings2.add(se.substring(0, 59));
+            strings2.add(se.substring(60));
+        }
+        strings = strings2;
+        while (strings.size() > 26) {
             strings.remove(0);
         }
         StringBuilder out = new StringBuilder();
-        for(String str : strings){
+        for (String str : strings) {
             out.append(str).append("\n");
         }
         textPane.setText(out.toString());
@@ -100,7 +110,7 @@ public class Graphics extends JFrame{
      */
     public String loginDialog() {
         return JOptionPane.showInputDialog(this.panel,
-                "Введите никнейм");
+                "Введите никнейм", "Авторизация", JOptionPane.QUESTION_MESSAGE);
     }
 
     /**

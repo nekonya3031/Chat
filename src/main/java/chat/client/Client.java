@@ -123,6 +123,9 @@ class ClientSomthing{
             if (message.startsWith("||online")) {
                 online(message);
             }
+            if (message.startsWith("||story")) {
+                System.out.println(message);
+            }
         }
         public static void online(String message){
             message = message.substring(8);
