@@ -3,11 +3,11 @@ package chat.function;
 import java.util.Date;
 
 public class Message {
-    Long id;
-    String text;
-    String name;
-    Date date;
-    int type;
+    public Long id;
+    public String text;
+    public String name;
+    public Date date;
+    public int type;
 
     public Message(Long id, String text, String name, int type) {
         this.id = id;
@@ -26,7 +26,7 @@ public class Message {
     }
 
     public Message(String json) {
-        Message msg = Version.gson.fromJson(json, Message.class);
+        Message msg = Version.gson.fromJson(json, this.getClass());
         this.type = msg.type;
         this.name = msg.name;
         this.date = msg.date;

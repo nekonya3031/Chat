@@ -1,6 +1,7 @@
 package chat.client;
 
 import chat.Core;
+import chat.function.Message;
 
 import java.io.*;
 import java.net.Socket;
@@ -118,16 +119,14 @@ class ClientSomthing{
     /**
      * Обработчик команд приходящих с сервера
      */
-    public static class Handler{
-        public static void handle(String message) {
-            if (message.startsWith("||online")) {
-                online(message);
-            }
-            if (message.startsWith("||story")) {
-                System.out.println(message);
+    public static class Handler {
+        public static void handle(Message message) {
+            if (message.type == -3) {
+                online(message.toString());
             }
         }
-        public static void online(String message){
+
+        public static void online(String message) {
             message = message.substring(8);
             ArrayList<String> rtn = new ArrayList<>();
             Collections.addAll(rtn, message.split("/s"));
@@ -168,17 +167,19 @@ class ClientSomthing{
         @Override
         public void run(){
             String str;
+            Message msg;
             try{
-                while(true){
+                while(true) {
                     str = in.readLine();
                     if (str.equals("disconnect")) {
                         ClientSomthing.this.downService();
                         break;
                     }
-                    if (str.startsWith("||")) {
-                        Handler.handle(str);
+                    msg = new Message(str);
+                    if (msg.type < 0) {
+                        Handler.handle(msg);
                     } else {
-                        log(str);
+                        log(msg.toString());
                     }
 
                 }

@@ -1,6 +1,7 @@
 package chat.function;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class Version {
     public static String prefix, type;
@@ -12,7 +13,7 @@ public class Version {
         this.version = version;
         this.prefix = prefix;
         this.type = type;
-        this.gson = new Gson();
+        this.gson = new GsonBuilder().create();
     }
 
     public static Long getMessage_id() {
