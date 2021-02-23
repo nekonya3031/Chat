@@ -37,4 +37,12 @@ public class Message {
     public String toSend() {
         return Version.gson.toJson(this);
     }
+
+    public Message chatMessage(String text, String author) {
+        return new Message(Version.getMessage_id(), text, author, 0);
+    }
+
+    public Message systemMessage(String text) {
+        return new Message(-1L, text, "SERVER", 1);
+    }
 }
