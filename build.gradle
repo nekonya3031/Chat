@@ -5,6 +5,14 @@ plugins {
 setTargetCompatibility(JavaVersion.VERSION_1_8)
 setSourceCompatibility(JavaVersion.VERSION_1_8)
 
+repositories{
+    mavenCentral()
+}
+
+dependencies{
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF8'
 }
