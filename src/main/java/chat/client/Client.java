@@ -168,15 +168,16 @@ class ClientSomthing{
             try{
                 while(true){
                     str = in.readLine();
-                    if(str.equals("disconnect")){
+                    if (str.equals("disconnect")) {
                         ClientSomthing.this.downService();
                         break;
                     }
-                    if(str.startsWith("||")){
+                    if (str.startsWith("||")) {
                         Handler.handle(str);
-                        continue;
+                    } else {
+                        log(str);
                     }
-                    log(str);
+
                 }
             }catch(IOException e){
                 ClientSomthing.this.downService();

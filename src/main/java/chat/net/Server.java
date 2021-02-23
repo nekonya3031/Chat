@@ -212,7 +212,6 @@ class CommandHandler {
         for (Server.ServerSomthing vr : Server.serverList) {
             rtn.append(vr.name).append("/s");
         }
-        rtn.append("\n");
         return rtn.toString();
     }
 
@@ -239,7 +238,6 @@ class CommandHandler {
             rtna.add(Server.story.totalStory.get(i));
         }
         rtna.forEach(s -> rtn.append(s).append("/s"));
-        rtn.append("\n");
         return rtn.toString();
     }
 
