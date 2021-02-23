@@ -34,6 +34,9 @@ public class Message {
         this.text = msg.text;
     }
 
+    public Message() {
+    }
+
     public String toSend() {
         return Version.gson.toJson(this);
     }

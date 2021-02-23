@@ -187,11 +187,9 @@ public class Server {
         public void printStory(BufferedWriter writer) {
             if (story.size() > 0) {
                 try {
-                    writer.write("Последние 20 сообщений" + "\n");
                     for (Message msg : story) {
                         writer.write(msg.toSend() + "\n");
                     }
-                    writer.write("/конец/" + "\n");
                     writer.flush();
                 } catch (IOException ignored) {
                 }
@@ -265,7 +263,7 @@ class CommandHandler {
             ArrayList<Server.ServerSomthing> removed = new ArrayList<>();
             for (Server.ServerSomthing vr : Server.serverList) {
                 try {
-                    vr.out.write("||activePing\n");
+                    vr.out.write(Message.pingMessage().toSend() + "\n");
                     vr.out.flush();
                 }catch(IOException e){
                     removed.add(vr);
