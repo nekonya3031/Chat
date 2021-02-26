@@ -19,6 +19,7 @@ public class Graphics extends JFrame{
     java.util.Timer timer = new java.util.Timer();
     public Graphics(){
         super("Chat" + " - " + version.type + ' ' + version.version + " | " + version.prefix);
+        this.setSize(size.x, size.y);
         timer.schedule(new OnlineChecker(), 1L, 1L);
         textPane = new JTextPane();
         online = new JTextPane();
@@ -51,7 +52,6 @@ public class Graphics extends JFrame{
         panel.add(send);
         panel.setBackground(new Color(60, 63, 65));
         setContentPane(panel);
-        this.setSize(size.x, size.y);
         setResizable(false);
         addWindowListener(new WindowAdapter()
         {
