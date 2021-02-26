@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.TimerTask;
 
-import static chat.Core.size;
-import static chat.Core.version;
+import static chat.Core.*;
 
 public class Graphics extends JFrame{
     JTextPane textPane;
@@ -33,16 +32,16 @@ public class Graphics extends JFrame{
         textPane.setText(textPane.getText() + "\n");
         textPane.setEditable(false);
         online.setEditable(false);
-        textPane.setBounds(10, 10, size.x - 200, size.y - 100);
+        textPane.setBounds(10, 10, getWidth() - 200, getHeight() - 100);
         textPane.setBackground(new Color(43, 43, 43));
         textPane.setForeground(new Color(255, 255, 255));
-        input.setBounds(10, size.y - 80, size.x - 80, 25);
+        input.setBounds(10, getHeight() - 80, getWidth() - 80, 25);
         input.setBackground(new Color(49, 51, 53));
         input.setForeground(new Color(255, 255, 255));
-        send.setBounds(size.x - 60, size.y - 80, 40, 25);
+        send.setBounds(getWidth() - 60, getHeight() - 80, 40, 25);
         send.setBackground(new Color(116, 122, 128));
         send.setForeground(new Color(255, 255, 255));
-        online.setBounds(size.x - 180, 10, 160, size.y - 100);
+        online.setBounds(getWidth() - 180, 10, 160, getHeight() - 100);
         online.setBackground(new Color(43, 43, 43));
         online.setForeground(new Color(255,255,255));
         panel.setLayout(null);
